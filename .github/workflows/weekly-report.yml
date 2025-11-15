@@ -1,0 +1,33 @@
+name: Weekly Bills Report
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  weekly-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run weekly comparison
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          GLUE_WEBHOOK_URL: ${{ secrets.GLUE_WEBHOOK_URL }}
+          GLUE_TARGET: ${{ secrets.GLUE_TARGET }}
+        run: |
+          python weekly_comparison.py
+
