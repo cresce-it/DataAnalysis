@@ -5,8 +5,9 @@ Data analysis tools for analyzing utility bills from MongoDB, with automated wee
 ## Features
 
 - **Bills Analysis**: Comprehensive analysis of utility bills by week, vendor, and creator
-- **Weekly Comparison**: Automated weekly reports comparing current week vs previous week
-- **Glue Integration**: Automatic posting of weekly reports to Glue
+- **Daily Comparison**: Automated daily reports comparing today vs same day last week (runs weekdays at 8:45 AM)
+- **Weekly Comparison**: Automated weekly reports comparing current week vs previous week (runs Sunday at 8:00 PM)
+- **Glue Integration**: Automatic posting of reports to Glue
 - **MongoDB Integration**: Direct connection to MongoDB for real-time data analysis
 
 ## Prerequisites
@@ -84,6 +85,21 @@ This generates:
 - Breakdown by vendor
 - CSV export: `bills_analysis.csv`
 
+### Daily Comparison
+
+Generate and post daily comparison report:
+
+```bash
+source venv/bin/activate
+python daily_comparison.py
+```
+
+This will:
+- Compare today vs same day last week
+- Show overall metrics with green/red indicators
+- Automatically post to Glue if configured
+- Runs automatically weekdays at 8:45 AM via GitHub Actions
+
 ### Weekly Comparison
 
 Generate and post weekly comparison report:
@@ -99,6 +115,7 @@ This will:
 - Display top 3 energy providers
 - Display top 5 contributors
 - Automatically post to Glue if configured
+- Runs automatically Sunday at 8:00 PM via GitHub Actions
 
 ## GitHub Actions Setup
 
@@ -110,50 +127,20 @@ Go to your repository settings → Secrets and variables → Actions, and add:
 - `GLUE_WEBHOOK_URL`: Your Glue webhook URL
 - `GLUE_TARGET`: Your Glue group or thread ID
 
-### 2. Create Workflow File
+### 2. Workflow Files
 
-Create `.github/workflows/weekly-report.yml`:
+The repository includes two workflow files:
 
-```yaml
-name: Weekly Bills Report
+- **`.github/workflows/daily-report.yml`**: Runs weekdays (Mon-Fri) at 8:45 AM UTC
+- **`.github/workflows/weekly-report.yml`**: Runs Sunday at 8:00 PM UTC
 
-on:
-  schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 9 AM UTC
-  workflow_dispatch:  # Allow manual trigger
-
-jobs:
-  weekly-report:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
-      - name: Run weekly comparison
-        env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          GLUE_WEBHOOK_URL: ${{ secrets.GLUE_WEBHOOK_URL }}
-          GLUE_TARGET: ${{ secrets.GLUE_TARGET }}
-        run: |
-          python weekly_comparison.py
-```
+Both workflows are already configured and will use the secrets you set up.
 
 ### 3. Manual Trigger
 
-You can also trigger the workflow manually:
+You can trigger workflows manually:
 - Go to Actions tab in GitHub
-- Select "Weekly Bills Report"
+- Select "Daily Bills Report" or "Weekly Bills Report"
 - Click "Run workflow"
 
 ## Project Structure
@@ -163,11 +150,16 @@ DataAnalysis/
 ├── main.py                 # MongoDB connection class
 ├── config.py              # Configuration and excluded users
 ├── bills_analysis.py       # Comprehensive bills analysis
+├── daily_comparison.py     # Daily comparison report
 ├── weekly_comparison.py    # Weekly comparison report
 ├── analyze.py              # Example analysis script
 ├── requirements.txt        # Python dependencies
 ├── setup.sh                # Setup script
 ├── .env                    # Environment variables (not in git)
+├── .github/
+│   └── workflows/
+│       ├── daily-report.yml    # Daily report workflow
+│       └── weekly-report.yml   # Weekly report workflow
 └── README.md              # This file
 ```
 
@@ -181,6 +173,14 @@ Generates comprehensive analysis of all bills:
 - Exports to CSV
 - Excludes configured user IDs
 
+### `daily_comparison.py`
+
+Generates daily comparison report:
+- Compares today vs same day last week
+- Shows overall metrics with percentage changes
+- Posts to Glue automatically
+- Runs weekdays at 8:45 AM via GitHub Actions
+
 ### `weekly_comparison.py`
 
 Generates weekly comparison report:
@@ -189,8 +189,14 @@ Generates weekly comparison report:
 - Highlights top 3 energy providers
 - Highlights top 5 contributors
 - Posts to Glue automatically
+- Runs Sunday at 8:00 PM via GitHub Actions
 
 ## Output Format
+
+### Daily Comparison Report
+
+The report includes:
+- **Overall Metrics**: Bills count, amounts, kWh, costs comparing today vs same day last week
 
 ### Weekly Comparison Report
 
@@ -199,7 +205,7 @@ The report includes:
 - **Top Energy Providers**: Top 3 providers by bill count
 - **Top Contributors**: Top 5 contributors by bill count
 
-Indicators:
+Indicators (both reports):
 - 🟢 Green: Positive change (increase)
 - 🔴 Red: Negative change (decrease)
 - ⚪ Neutral: No significant change

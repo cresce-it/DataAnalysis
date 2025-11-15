@@ -1,12 +1,12 @@
-name: Weekly Bills Report
+name: Daily Bills Report
 
 on:
   schedule:
-    - cron: '0 20 * * 0'
+    - cron: '45 8 * * 1-5'
   workflow_dispatch:
 
 jobs:
-  weekly-report:
+  daily-report:
     runs-on: ubuntu-latest
     
     steps:
@@ -23,11 +23,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      - name: Run weekly comparison
+      - name: Run daily comparison
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           GLUE_WEBHOOK_URL: ${{ secrets.GLUE_WEBHOOK_URL }}
           GLUE_TARGET: ${{ secrets.GLUE_TARGET }}
         run: |
-          python weekly_comparison.py
+          python daily_comparison.py
 
