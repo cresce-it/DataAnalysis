@@ -3,10 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MONGODB_URI = os.getenv(
-    "MONGODB_URI",
-    "mongodb+srv://n8n:00XVDe1yOeWhBqAz@web.dxlnz.mongodb.net/main"
-)
+MONGODB_URI = os.getenv("MONGODB_URI")
+if not MONGODB_URI:
+    raise ValueError("MONGODB_URI environment variable is required. Please set it in your .env file.")
 
 EXCLUDED_USER_IDS = [
     "68e7e7c09e5d01bd097bece9",
