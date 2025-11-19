@@ -421,9 +421,9 @@ Based on the collections analyzed, consider creating MCP tools for:
 - `average_bill_amount(filters)` - Average bill amount
 - `average_annual_cost_per_bill(filters)` - Average annual cost per bill
 
-**Comparison Tools:**
+-**Comparison Tools:**
 - `compare_periods(period1_start, period1_end, period2_start, period2_end)` - Compare two periods
-- `compare_today_vs_last_week()` - Today vs same day last week
+- `compare_day_vs_previous_day()` - Yesterday vs previous day
 - `compare_week_vs_last_week()` - This week vs last week
 - `compare_by_vendor(vendor_name, period1, period2)` - Vendor comparison
 

@@ -117,26 +117,26 @@ def format_change(current: float, previous: float, reverse: bool = False) -> str
     return f"{emoji} {sign}{change:.1f}%"
 
 
-def generate_daily_report(today_stats: dict, last_week_stats: dict, today: datetime, last_week: datetime) -> str:
+def generate_daily_report(target_stats: dict, comparison_stats: dict, target_day: datetime, comparison_day: datetime) -> str:
     report = f"## 📊 Daily Bills Report\n\n"
-    report += f"**{today.strftime('%Y-%m-%d')}** vs **{last_week.strftime('%Y-%m-%d')}** (same day last week)\n\n"
+    report += f"**{target_day.strftime('%Y-%m-%d')}** vs **{comparison_day.strftime('%Y-%m-%d')}** (previous day)\n\n"
     report += "---\n\n"
     report += "### Overall Metrics\n\n"
     
-    bills_change = format_change(today_stats['bills_count'], last_week_stats['bills_count'])
-    report += f"**Bills Added:** {today_stats['bills_count']} (vs {last_week_stats['bills_count']}) {bills_change}\n\n"
+    bills_change = format_change(target_stats['bills_count'], comparison_stats['bills_count'])
+    report += f"**Bills Added:** {target_stats['bills_count']} (vs {comparison_stats['bills_count']}) {bills_change}\n\n"
     
-    amount_change = format_change(today_stats['total_bill_amount'], last_week_stats['total_bill_amount'])
-    report += f"**Total Bill Amount:** €{today_stats['total_bill_amount']:,.2f} (vs €{last_week_stats['total_bill_amount']:,.2f}) {amount_change}\n\n"
+    amount_change = format_change(target_stats['total_bill_amount'], comparison_stats['total_bill_amount'])
+    report += f"**Total Bill Amount:** €{target_stats['total_bill_amount']:,.2f} (vs €{comparison_stats['total_bill_amount']:,.2f}) {amount_change}\n\n"
     
-    kwh_change = format_change(today_stats['total_annual_kwh'], last_week_stats['total_annual_kwh'])
-    report += f"**Total Annual kWh:** {today_stats['total_annual_kwh']:,.0f} kWh (vs {last_week_stats['total_annual_kwh']:,.0f} kWh) {kwh_change}\n\n"
+    kwh_change = format_change(target_stats['total_annual_kwh'], comparison_stats['total_annual_kwh'])
+    report += f"**Total Annual kWh:** {target_stats['total_annual_kwh']:,.0f} kWh (vs {comparison_stats['total_annual_kwh']:,.0f} kWh) {kwh_change}\n\n"
     
-    cost_change = format_change(today_stats['total_annual_cost'], last_week_stats['total_annual_cost'])
-    report += f"**Total Annual Cost:** €{today_stats['total_annual_cost']:,.2f} (vs €{last_week_stats['total_annual_cost']:,.2f}) {cost_change}\n\n"
+    cost_change = format_change(target_stats['total_annual_cost'], comparison_stats['total_annual_cost'])
+    report += f"**Total Annual Cost:** €{target_stats['total_annual_cost']:,.2f} (vs €{comparison_stats['total_annual_cost']:,.2f}) {cost_change}\n\n"
     
-    avg_cost_change = format_change(today_stats['avg_annual_cost_per_bill'], last_week_stats['avg_annual_cost_per_bill'])
-    report += f"**Avg Annual Cost per Bill:** €{today_stats['avg_annual_cost_per_bill']:,.2f} (vs €{last_week_stats['avg_annual_cost_per_bill']:,.2f}) {avg_cost_change}\n\n"
+    avg_cost_change = format_change(target_stats['avg_annual_cost_per_bill'], comparison_stats['avg_annual_cost_per_bill'])
+    report += f"**Avg Annual Cost per Bill:** €{target_stats['avg_annual_cost_per_bill']:,.2f} (vs €{comparison_stats['avg_annual_cost_per_bill']:,.2f}) {avg_cost_change}\n\n"
     
     return report
 
@@ -176,16 +176,17 @@ def main():
         print("Processing data...")
         processed_df = process_bills_data(raw_df)
         
-        today = datetime.now()
-        today_start = get_day_start(today)
-        last_week_start = today_start - timedelta(days=7)
+        now = datetime.now()
+        target_day = now - timedelta(days=1)
+        target_start = get_day_start(target_day)
+        comparison_start = target_start - timedelta(days=1)
         
-        print(f"Analyzing {today_start.strftime('%Y-%m-%d')} vs {last_week_start.strftime('%Y-%m-%d')}...")
+        print(f"Analyzing {target_start.strftime('%Y-%m-%d')} vs {comparison_start.strftime('%Y-%m-%d')}...")
         
-        today_stats = get_day_stats(processed_df, today_start)
-        last_week_stats = get_day_stats(processed_df, last_week_start)
+        target_stats = get_day_stats(processed_df, target_start)
+        comparison_stats = get_day_stats(processed_df, comparison_start)
         
-        report = generate_daily_report(today_stats, last_week_stats, today_start, last_week_start)
+        report = generate_daily_report(target_stats, comparison_stats, target_start, comparison_start)
         
         print("\n" + "="*80)
         print("DAILY COMPARISON REPORT")

@@ -5,7 +5,7 @@ Data analysis tools for analyzing utility bills from MongoDB, with automated wee
 ## Features
 
 - **Bills Analysis**: Comprehensive analysis of utility bills by week, vendor, and creator
-- **Daily Comparison**: Automated daily reports comparing today vs same day last week (runs weekdays at 8:45 AM)
+- **Daily Comparison**: Automated daily reports comparing yesterday vs the day before (runs weekdays at 8:45 AM)
 - **Weekly Comparison**: Automated weekly reports comparing current week vs previous week (runs Sunday at 8:00 PM)
 - **Glue Integration**: Automatic posting of reports to Glue
 - **MongoDB Integration**: Direct connection to MongoDB for real-time data analysis
@@ -95,7 +95,7 @@ python daily_comparison.py
 ```
 
 This will:
-- Compare today vs same day last week
+- Compare yesterday vs the previous day
 - Show overall metrics with green/red indicators
 - Automatically post to Glue if configured
 - Runs automatically weekdays at 8:45 AM via GitHub Actions
@@ -176,7 +176,7 @@ Generates comprehensive analysis of all bills:
 ### `daily_comparison.py`
 
 Generates daily comparison report:
-- Compares today vs same day last week
+- Compares yesterday vs the previous day
 - Shows overall metrics with percentage changes
 - Posts to Glue automatically
 - Runs weekdays at 8:45 AM via GitHub Actions
@@ -196,7 +196,7 @@ Generates weekly comparison report:
 ### Daily Comparison Report
 
 The report includes:
-- **Overall Metrics**: Bills count, amounts, kWh, costs comparing today vs same day last week
+- **Overall Metrics**: Bills count, amounts, kWh, costs comparing yesterday vs the previous day
 
 ### Weekly Comparison Report
 
